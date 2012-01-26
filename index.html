@@ -1,0 +1,62 @@
+<?php
+require_once("HandleCSV.php");
+require_once("ScatterGraph.php");
+
+$mimeError = false;
+$dataError = false;
+$graphData = array();
+
+//Check if file was uploaded
+if (!empty($_FILES['upload']['name'])) {
+	$csvData = new HandleCSV();
+	$mimeError = $csvData->mimeError;
+	$dataError = $csvData->dataError;
+	if (isset($csvData->graphData)) {
+		$graphData = $csvData->graphData;
+	}
+	$graph = new ScatterGraph($graphData);
+}
+?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body>
+<h1>Hey Hey</h1>
+<div>
+<?php 
+if (isset($csvData) && !$mimeError) {
+	if ($dataError) {
+		echo "<span class='error'>The CSV file contained invalid data, please ensure:<br/>
+			  column1 = type (string)<br />
+			  column2 = x-coordinate (int)<br />
+			  column3 = y-coordinate (int)<br />
+			  </span>";
+	} else {
+		$graph->outputGraph();
+	}
+} else {
+	echo "<span class='error'>Upload CSV file to display graph</span>";
+}
+?>
+</div>
+<form method="post"
+enctype="multipart/form-data">
+<label for="file">Filename:</label>
+<input type="file" name="upload" id="upload" />
+<?php
+if ($mimeError) { 
+	echo "<span class='error'>The file was not a CSV file, please try again</span>";
+}
+?>
+<br />
+<input type="submit" name="submit" value="Submit" />
+</form>
+
+</body>
+</html>
