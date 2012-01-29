@@ -5,25 +5,27 @@ class ScatterGraph {
 	 * Class properties
 	 */
 	private $_imageHandle; //stores GD image handle
+	private $_dataX = array();
+	private $_dataY = array();
 
 	/**
 	 * Constructor
 	 */
-	public function __construct($graphData) {
-		$this->createGraph($graphData);
-		print_r($graphData);//### where we're at = csv data ########
+	public function __construct($x,$y) {
+		$this->setDataX($x);
+		$this->setDataY($y);
+		$this->createGraph($this->_dataX,$this->_dataY);
 	}
+	
 	
 	/**
 	 * Generates graph a stores GD handle to image
 	 */
-	public function createGraph() {
+	public function createGraph($x,$y) {
+
 		require_once ('jpgraph/jpgraph.php');
 		require_once ('jpgraph/jpgraph_scatter.php');
-
-		$datax = array(3.5,3.7,3,4,6.2,6,3.5,8,14,8,11.1,13.7);
-		$datay = array(20,22,12,13,17,20,16,19,30,31,40,43);
-
+		
 		$graph = new Graph(300,200);
 		$graph->SetScale("linlin");
 
@@ -33,7 +35,7 @@ class ScatterGraph {
 		$graph->title->Set("A simple scatter plot");
 		$graph->title->SetFont(FF_FONT1,FS_BOLD);
 
-		$sp1 = new ScatterPlot($datay,$datax);
+		$sp1 = new ScatterPlot($y,$x);
 
 		$graph->Add($sp1);
 		
@@ -54,8 +56,21 @@ class ScatterGraph {
 		$image = ob_get_contents();
 		ob_end_clean();
 		
-		echo '<img src="data:image/png;base64,' . base64_encode($image) . '"';
+		return '<img src="data:image/png;base64,' . base64_encode($image) . '"/>';
 	}
-	
+	 
+	/**
+	 * Sets x axis data array from string
+	 */
+	 public function setDataX($data) {
+		$this->_dataX = split(",",$data);
+	 }
+
+	/**
+	 * Sets y axis data array from string
+	 */
+	 public function setDataY($data) {
+		$this->_dataY = split(",",$data);
+	 }
 }
 ?>
