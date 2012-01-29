@@ -9,15 +9,25 @@ $graphDataStr = null;
 $x = null;
 $y = null;
 
-//handle form if submitted
+//If form submitted check a file was uploaded
 if (isset($_POST['submit'])) {
-	//Check if file was uploaded
 	if (!empty($_FILES['upload']['name'])) {
+		/**
+		 * instantiate HandleCSV class, parse csv
+		 * and grab data or mime type errors, and 
+		 * the graph data as a string of values
+		 */
 		$csvData = new HandleCSV();
 		$csvData->processCSV();
 		$mimeError = $csvData->mimeError;
 		$dataError = $csvData->dataError;
 		$graphDataStr = $csvData->getGraphDataStr();
+		/**
+		 * if the csv object graph data has been 
+		 * extracted and there are no errors then
+		 * get the x & y axis data as strings and
+		 * instantiate a new graph object
+		 */
 		if (isset($csvData->graphData) && !$mimeError && !$dataError) {
 			$x = $csvData->getDataXStr();
 			$y = $csvData->getDatayStr();
@@ -33,51 +43,57 @@ if (isset($_POST['submit'])) {
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 
 <head>
-	<title></title>
+	<title>PHP Developer Test</title>
+	
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" src="js/index.js"></script>
+	
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
 </head>
 <body>
-<h1>Hey Hey</h1>
-<div id="graphcontainer">
-<?php 
-if (isset($csvData) && !$mimeError) {
-	if ($dataError) {
-		echo "<span class='error'>The CSV file contained invalid data, please ensure:<br/>
-			  column1 = type (string)<br />
-			  column2 = x-coordinate (int)<br />
-			  column3 = y-coordinate (int)<br />
-			  </span>";
-	} else {
-		echo "<div id='graphdiv'>" . $graph->outputGraph() . "</div>";
-	}
-} else {
-	echo "<span class='error'>Upload CSV file to display graph</span>";
-}
-?>
-</div>
-<?php
-echo "<form method='post' action='' enctype='multipart/form-data' onsubmit='return checksubmit(\"$graphDataStr\")'>";
-if (isset($csvData->uniqueTypes) && !$mimeError && !$dataError) {
-	echo "<p><label for='filter'>Filter:</label><br/>";
-	echo "<select name='filter' id='filter' multiple>";
-	foreach ($csvData->uniqueTypes as $type) {
-		echo "<option value='$type'>$type</option>";
-	}
-	echo "</select></p>";
-}
-?>
-<p><label for="upload">Filename:</label>
-<input type="file" name="upload" id="upload" />
-<?php
-if ($mimeError) { 
-	echo "<span class='error'>The file was not a CSV file, please try again</span>";
-}
-?>
-<br /></p>
-<p><input type="submit" name="submit" value="Submit" /></p>
-</form>
+	<p>Graph:</p>
+	<div id="graphcontainer">
+		<?php 
+		//display error messages or graph
+		if (isset($csvData) && !$mimeError) {
+			if ($dataError) {
+				echo "<span class='error'>The CSV file contained invalid data, please ensure:<br/>
+					  column1 = type (string)<br />
+					  column2 = x-coordinate (int)<br />
+					  column3 = y-coordinate (int)<br />
+					  </span>";
+			} else {
+				echo "<div id='graphdiv'>" . $graph->outputGraph() . "</div>"; //display graph
+			}
+		} else {
+			echo "<span class='error'>Upload CSV file to display graph</span>";
+		}
+		?>
+	</div>
+	<?php
+	//display form with file upload and filter select if applicable
+	echo "<form method='post' action='' enctype='multipart/form-data' onsubmit='return checksubmit(\"$graphDataStr\")'>"; //call js function on submit
+		if (isset($csvData->uniqueTypes) && !$mimeError && !$dataError) {
+			echo "<p><label for='filter'>Filter:</label><br/>";
+			echo "<select name='filter' id='filter' multiple>";
+			foreach ($csvData->uniqueTypes as $type) {
+				echo "<option value='$type'>$type</option>";
+			}
+			echo "</select></p>";
+		}
+		?>
+		<p><label for="upload">Upload another file:</label><br />
+		<input type="file" name="upload" id="upload" />
+		<?php
+		if ($mimeError) { 
+			echo "<span class='error'>The file was not a CSV file, please try again</span>";
+		}
+		?>
+		<br /></p>
+		<p><input type="submit" name="submit" value="Submit" /></p>
+	</form>
 
-</body>
+	</body>
 </html>

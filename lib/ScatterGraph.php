@@ -4,12 +4,13 @@ class ScatterGraph {
 	/**
 	 * Class properties
 	 */
-	private $_imageHandle; //stores GD image handle
-	private $_dataX = array();
-	private $_dataY = array();
+	private $_imageHandle; //GD image handle
+	private $_dataX = array(); //X Axis Data
+	private $_dataY = array(); //Y Axis Data
 
 	/**
-	 * Constructor
+	 * Constructor - Stores axis data and generates
+	 * graph image
 	 */
 	public function __construct($x,$y) {
 		$this->setDataX($x);
@@ -19,7 +20,7 @@ class ScatterGraph {
 	
 	
 	/**
-	 * Generates graph a stores GD handle to image
+	 * Generates graph and stores handle to GD image
 	 */
 	public function createGraph($x,$y) {
 
@@ -27,7 +28,7 @@ class ScatterGraph {
 		require_once ('jpgraph/jpgraph_scatter.php');
 		
 		$graph = new Graph(300,200);
-		$graph->SetScale("linlin");
+		$graph->SetScale("intint");
 
 		$graph->img->SetMargin(40,40,40,40);		
 		$graph->SetShadow();
@@ -36,6 +37,9 @@ class ScatterGraph {
 		$graph->title->SetFont(FF_FONT1,FS_BOLD);
 
 		$sp1 = new ScatterPlot($y,$x);
+		$sp1->mark->SetType(MARK_FILLEDCIRCLE);
+		$sp1->mark->SetFillColor('red');
+		$sp1->mark->SetWidth(8);
 
 		$graph->Add($sp1);
 		

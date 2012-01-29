@@ -1,0 +1,7 @@
+Installation
+============
+
+1) Extract archive structure into desired web server document root location
+2) Download JPGraph library (http://jpgraph.net) and extract
+3) Place contents of jpgraph-x.x.tar.gz/jpgraph-x.x/src into the jpgraph/ folder of the application on the web server
+4) Enjoy!

@@ -1,16 +1,26 @@
 ﻿<?php
 Class HandleCSV {
 
-	public $uploadedFile;
-	public $mimeError = false;
-	public $dataError = false;
-	public $graphData = array();
-	public $uniqueTypes = array();
+	/**
+	 * Class properties
+	 */
+	public $uploadedFile; //path to temp file
+	public $mimeError = false; //flags mime error for uploaded file
+	public $dataError = false; //flags column type errors for CSV data
+	public $graphData = array();  //stores multidimensional array of graph data
+	public $uniqueTypes = array();  //stores array of unique filter types
 	
+	/**
+	 * Constructor
+	 */
 	public function __construct() {
 		
 	}
 	
+	/**
+	 * Check file type is valid and 
+	 * parse csv file
+	 */
 	public function processCSV() {
 		$this->checkFile();
 		//if the file type is valid
@@ -19,6 +29,10 @@ Class HandleCSV {
 		}
 	}
 	
+	/**
+	 * Check uploaded file matches expected
+	 * mime type to confirm only csv file uploaded
+	 */
 	private function checkFile() {
 		$validMimes = array(
 			'text/csv',
@@ -38,6 +52,11 @@ Class HandleCSV {
 		}
 	}
 	
+	/**
+	 * Parse csv and place column data in multidimensional array
+	 * or flag data error if columns don't match expected format,
+	 * also stores unique filters in array
+	 */
 	private function parseCSV() {
 		$handle = fopen($this->uploadedFile, "r") or die("couldn't open CSV file");
 		//grab all lines of CSV file
@@ -45,8 +64,8 @@ Class HandleCSV {
 		while (!feof($handle)) {
 			$data = fgetcsv($handle,0,",");
 			//add current line of data if valid or flag error
-			if (is_array($data) && count($data) == 3) {
-				if (is_string($data[0]) && is_numeric($data[1]) && is_numeric($data[2])) {
+			if (is_array($data) && count($data) == 3) { //3 data columns
+				if (is_string($data[0]) && is_numeric($data[1]) && is_numeric($data[2])) {//string,int,int data types
 					if (!in_array($data[0],$this->uniqueTypes)) {
 						array_push($this->uniqueTypes,$data[0]);
 					}
@@ -91,7 +110,7 @@ Class HandleCSV {
 	 }
 	 
 	 /**
-	 * Returns graph data for as a string
+	 * Returns all graph data as a string
 	 */
 	 public function getGraphDataStr() {
 		$dataStr = "";
